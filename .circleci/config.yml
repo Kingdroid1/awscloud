@@ -1,1 +1,22 @@
-
+---
+version: 2.1
+orbs:
+  aws-cli: amazon/aws-cli@3.1.1
+jobs:
+  create_infrastructure:
+    docker:
+      - image: amazon/aws-cli@3.1.1
+    steps:
+      - checkout
+      - run:
+          name: Create Cloudformation Stack
+          command: |
+            aws cloudformation deploy \
+              --template-file template.yml \
+              --stack-name deployStack-${CIRCLE_WORKFLOW_ID:0:5} \
+              --region us-east-1
+# Sequential workflow
+workflows:
+  deployWorkflow:
+    jobs:
+      - create_infrastructure
