@@ -5,7 +5,7 @@ orbs:
 jobs:
   create_infrastructure:
     docker:
-      - image: circleci/aws-cli@3.1.1
+      - image: amazon/aws-cli
     steps:
       - checkout
       - run:
