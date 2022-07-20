@@ -31,14 +31,36 @@ jobs:
           name: Run Playbook and Configure server
           command: |
             ansible-playbook -i inventory.txt main-remote.yml
-            
+
+  smoke_test:
+    docker:
+      - image: alpine:latest
+    steps:
+      - run: apk add --update curl
+      - run:
+          name: smoke test
+          command: |
+            URL="https://blog.udacity.com/"
+            if curl -s --head ${URL} 
+            then
+              return 0
+            else
+              return 1
+            fi
+
 # Sequential workflow
 workflows:
-  infra_deploy:
-    jobs:
+  # infra_deploy:
+  #   jobs:
       # - create_infrastructure:
       #     context: my_context
-      - configure_infrastructure:
+      # - configure_infrastructure:
+      #     filters:
+      #       branches:
+      #         only: main
+  smoke_testing:
+    jobs:
+      - smoke_test:
           filters:
             branches:
               only: main
