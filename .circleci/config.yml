@@ -15,9 +15,30 @@ jobs:
               --template-file template.yml \
               --stack-name infraStack-${CIRCLE_WORKFLOW_ID:0:5} \
               --region us-east-1
+
+  configure_infrastructure:
+    docker:
+      - image: python:3.7-alpine3.11
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints: ["72:e2:14:f9:16:fd:36:19:0e:c0:41:5d:7c:e5:d5:bb"]
+      - run:
+          name: Install Ansible
+          command: |
+            apk add --update ansible
+      - run:
+          name: Run Playbook and Configure server
+          command: |
+            ansible-playbook -i inventory.txt main-remote.yml
+            
 # Sequential workflow
 workflows:
   infra_deploy:
     jobs:
-      - create_infrastructure:
-          context: my_context
+      # - create_infrastructure:
+      #     context: my_context
+      - configure_infrastructure:
+          filter:
+            branches:
+              only: main
