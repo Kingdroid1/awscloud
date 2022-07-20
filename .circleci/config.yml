@@ -2,6 +2,16 @@
 version: 2.1
 orbs:
   aws-cli: circleci/aws-cli@3.1.1
+
+commands:
+   destroy_environment:
+     steps:
+       - run:
+           name: Destroy environment
+           when: on_fail
+           command: |
+             aws cloudformation delete-stack --stack-name myStack-${CIRCLE_WORKFLOW_ID:0:7}
+
 jobs:
   create_infrastructure:
     docker:
@@ -13,7 +23,7 @@ jobs:
           command: |
             aws cloudformation deploy \
               --template-file template.yml \
-              --stack-name infraStack-${CIRCLE_WORKFLOW_ID:0:5} \
+              --stack-name myStack-${CIRCLE_WORKFLOW_ID:0:5} \
               --region us-east-1
 
   configure_infrastructure:
@@ -39,21 +49,25 @@ jobs:
       - run: apk add --update curl
       - run:
           name: smoke test
-          command: |
-            URL="https://blog.udacity.com/"
-            if curl -s --head ${URL} 
-            then
-              return 0
-            else
-              return 1
-            fi
+          command: return 1
+            # URL="https://blog.udacity.com/"
+            # if curl -s --head ${URL} 
+            # then
+            #   return 0
+            # else
+            #   return 1
+            # fi
+      - destroy_environment
 
 # Sequential workflow
 workflows:
-  # infra_deploy:
-  #   jobs:
-      # - create_infrastructure:
-      #     context: my_context
+  infra_deploy:
+    jobs:
+      - create_infrastructure:
+          context: my_context
+          filters:
+            branches:
+              only: main
       # - configure_infrastructure:
       #     filters:
       #       branches:
