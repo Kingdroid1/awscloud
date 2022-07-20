@@ -5,7 +5,9 @@ orbs:
 
 commands:
    destroy_environment:
-     steps:
+    docker:
+      - image: amazon/aws-cli
+    steps:
        - run:
            name: Destroy environment
            when: on_fail
