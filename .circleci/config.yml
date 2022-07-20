@@ -39,6 +39,6 @@ workflows:
       # - create_infrastructure:
       #     context: my_context
       - configure_infrastructure:
-          filter:
+          filters:
             branches:
               only: main
